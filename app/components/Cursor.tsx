@@ -12,10 +12,7 @@ export default function Cursor() {
   const springX = useSpring(cursorX, { stiffness: 300, damping: 25 })
   const springY = useSpring(cursorY, { stiffness: 300, damping: 25 })
 
-  // Store pulse animations
-  const [pulses, setPulses] = useState<
-    { id: number; x: number; y: number }[]
-  >([])
+  const [pulses, setPulses] = useState<{ id: number; x: number; y: number }[]>([])
 
   useEffect(() => {
     const moveCursor = (e: MouseEvent) => {
@@ -23,20 +20,13 @@ export default function Cursor() {
       cursorY.set(e.clientY)
     }
     window.addEventListener("mousemove", moveCursor)
-
     return () => window.removeEventListener("mousemove", moveCursor)
   }, [])
 
-  // CLICK PULSE EFFECT
   useEffect(() => {
     const createPulse = (e: MouseEvent) => {
       const id = Date.now()
-      const x = e.clientX
-      const y = e.clientY
-
-      setPulses((prev) => [...prev, { id, x, y }])
-
-      // Remove after animation
+      setPulses((prev) => [...prev, { id, x: e.clientX, y: e.clientY }])
       setTimeout(() => {
         setPulses((prev) => prev.filter((p) => p.id !== id))
       }, 600)
@@ -46,10 +36,8 @@ export default function Cursor() {
     return () => window.removeEventListener("click", createPulse)
   }, [])
 
-  // MAGNETIC EFFECT
   useEffect(() => {
     const items = document.querySelectorAll("[data-magnetic]")
-
     items.forEach((item) => {
       const strength = 50
 
@@ -72,14 +60,12 @@ export default function Cursor() {
   }, [])
 
   return (
-    <>
+    <div className="hidden md:block">  {/* 🚀 HIDE ON MOBILE */}
+      
       {/* MAIN CURSOR */}
       <motion.div
         ref={cursorRef}
-        style={{
-          translateX: springX,
-          translateY: springY,
-        }}
+        style={{ translateX: springX, translateY: springY }}
         className="
           fixed top-0 left-0 w-10 h-10 rounded-full pointer-events-none z-[9999]
           border-2 border-[var(--wt-accent)] shadow-[0_0_20px_var(--wt-accent)]
@@ -96,15 +82,13 @@ export default function Cursor() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="
             pointer-events-none fixed w-10 h-10 rounded-full z-[9998]
-            border border-[var(--wt-accent)] 
+            border border-[var(--wt-accent)]
             shadow-[0_0_35px_var(--wt-accent)]
           "
-          style={{
-            left: pulse.x - 20,
-            top: pulse.y - 20,
-          }}
-        ></motion.div>
+          style={{ left: pulse.x - 20, top: pulse.y - 20 }}
+        />
       ))}
-    </>
+
+    </div>
   )
 }
